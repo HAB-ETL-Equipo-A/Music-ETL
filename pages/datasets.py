@@ -3,7 +3,9 @@ import glob
 import os
 import pandas as pd
 
-csv_files = glob.glob(os.path.join('datasets', '*.csv'))
+st.title('Datasets')
+
+csv_files = glob.glob(os.path.join('datasets/rank_1', '*.csv'))
 
 for file in csv_files:
     df = pd.read_csv(file)

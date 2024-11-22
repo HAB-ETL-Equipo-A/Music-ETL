@@ -95,6 +95,52 @@ class SpotifyAPI:
    
         return data
 
+    """Returns the json artists data from a list of artist ids"""
+    async def get_artists_data(self, artist_ids, retries, delay):
+        
+        async with aiohttp.ClientSession() as session:
+            
+            tasks = [self._get_artists_data(artist_ids[i:i+50], session, retries, delay) for i in range(0, len(artist_ids), 50)]
+            results = await asyncio.gather(*tasks)
+            
+        artists = [artist for result in results for artist in result['artists']]
+        return artists
+
+    async def _get_artists_data(self, artist_ids, session, retries, delay):
+
+        params = {
+            'ids': ','.join(artist_ids),
+        }
+        
+        endpoint = '/artists'
+
+        data = await self._get_response(params, endpoint, session, retries, delay)
+   
+        return data
+
+    """Returns the json artists data from a list of artist ids"""
+    async def get_albums_data(self, album_ids, retries, delay):
+        
+        async with aiohttp.ClientSession() as session:
+            
+            tasks = [self._get_albums_data(album_ids[i:i+20], session, retries, delay) for i in range(0, len(album_ids), 20)]
+            results = await asyncio.gather(*tasks)
+            
+        albums = [album for result in results for album in result['albums']]
+        return albums
+
+    async def _get_albums_data(self, album_ids, session, retries, delay):
+
+        params = {
+            'ids': ','.join(album_ids),
+        }
+        
+        endpoint = '/albums'
+
+        data = await self._get_response(params, endpoint, session, retries, delay)
+   
+        return data
+
     async def get_tracks_audio_features(self, track_ids, retries, delay):
         
         async with aiohttp.ClientSession() as session:
