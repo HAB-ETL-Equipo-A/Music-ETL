@@ -1,4 +1,12 @@
+streamlit
+streamlit_cookies_manager
 numpy
 pandas
-streamlit
 matplotlib
+seaborn
+requests
+aiohttp
+beautifulsoup4
+spacy
+transformers
+torch

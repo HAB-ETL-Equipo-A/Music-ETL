@@ -5,7 +5,7 @@ import sys
 sys.path.append('..')
 from etl_plots import ETLPlots
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="centered")
 
 st.title('Plots')
 

@@ -7,12 +7,10 @@ import requests
 
 class SpotifyAPI:
 
-    _BASE_URL = 'https://api.spotify.com/v1'
-
-    def __init__(self, secrets_path):
-        self._secrets_path = secrets_path
-        self._access_token = None
-        self._token_expires = 0
+    def __init__(self, access_token, token_expires):
+        self._BASE_URL = 'https://api.spotify.com/v1'
+        self._access_token = access_token
+        self._token_expires = token_expires
     
     def _get_headers(self):
 
@@ -157,7 +155,7 @@ class SpotifyAPI:
             'ids': ','.join(track_ids)
         }
         
-        endpoint = f'/audio-features'
+        endpoint = '/audio-features'
 
         data = await self._get_response(params, endpoint, session, retries, delay)
    
@@ -190,28 +188,28 @@ class SpotifyAPI:
     
         data = None
         attempts = 0
-    
         retriable_statuses = {429, 500, 503, 504}
         
         while data is None and attempts < retries:
-            
-            async with session.get(url, headers=headers) as response:
-                
-                if response.status in retriable_statuses:
-                    await asyncio.sleep(delay)
-                    continue
-                    
-                elif response.status == 401:
-                    self._generate_access_token()
-                    headers = self._get_headers()
-                    continue
-                    
-                else:
-                    response.raise_for_status()
-    
-                data = await response.json()
-
             attempts += 1
+            try:
+                async with session.get(url, headers=headers) as response:
+                    if response.status in retriable_statuses:
+                        await asyncio.sleep(delay)
+                        continue
+                    elif response.status == 401:
+                        self._generate_access_token()
+                        headers = self._get_headers()
+                        continue
+                    else:
+                        response.raise_for_status()
+                    
+                    data = await response.json()
+            except Exception as e:
+                print(f"Error fetching data: {e}")
+                if attempts >= retries:
+                    raise
+                await asyncio.sleep(delay)
    
         return data
  

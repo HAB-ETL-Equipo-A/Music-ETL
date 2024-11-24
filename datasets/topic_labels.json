@@ -2,12 +2,9 @@
   "labels": [
         ["OPTIMISM", "PESSIMISM"],
         ["LOVE", "HATE"],
-        ["JOY", "SORROW"],
         ["HOPE", "DESPAIR"],
         ["STRENGTH", "WEAKNESS"],
-        ["BRAVERY", "FEAR"],
         ["SUCCESS", "FAILURE"],
-        ["GRATITUDE", "ENTITLEMENT"],
         ["FORGIVENESS", "RESENTMENT"],
         ["PEACE", "CHAOS"]
     ]
