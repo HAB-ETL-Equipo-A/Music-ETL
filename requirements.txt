@@ -1,5 +1,5 @@
 streamlit
-streamlit_cookies_manager
+streamlit-cookies-manager
 numpy
 pandas
 matplotlib
@@ -7,6 +7,8 @@ seaborn
 requests
 aiohttp
 beautifulsoup4
+setuptools
+wheel
 spacy
 transformers
 torch
