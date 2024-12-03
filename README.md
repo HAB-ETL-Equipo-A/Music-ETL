@@ -1,8 +1,5 @@
 # Music-ETL
 
-# Pre-Requisites:
-https://spacy.io/usage
-
 ```bash
 git clone https://github.com/HAB-ETL-Equipo-A/Music-ETL
 cd Music-ETL
