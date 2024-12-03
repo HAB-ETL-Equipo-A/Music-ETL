@@ -1,6 +1,5 @@
 import pandas as pd
-import spacy
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 import torch
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -10,9 +9,9 @@ from functools import partial
 class Classifier:
 
     def __init__(self, task, model):
-        device = torch.cuda.current_device()
-        self.classifier = pipeline(task, model=model, device=device, fp16=True)
-        self.nlp = spacy.load("en_core_web_sm")
+        self.tokenizer = AutoTokenizer.from_pretrained(model)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.classifier = pipeline(task, model=model, device=0 if device == "cuda" else -1, fp16=True)
     
     def _tokenize(self, text):
         doc = self.nlp(text)
