@@ -7,8 +7,5 @@ seaborn
 requests
 aiohttp
 beautifulsoup4
-setuptools
-wheel
-spacy
 transformers
 torch
