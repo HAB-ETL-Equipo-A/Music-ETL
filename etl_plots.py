@@ -3,11 +3,29 @@ import matplotlib.dates as mdates
 import pandas as pd
 import numpy as np
 import seaborn as sns
+import os
+import json
+from airtable_api import AirtableAPI
 
 class ETLPlots:
 
-    def __init__(self, datasets_path):
-        self._datasets_path = datasets_path
+    def __init__(self):
+        
+        class_dir = os.path.dirname(os.path.abspath(__file__))
+        secrets_file_path = os.path.join(class_dir, 'secrets.json')
+        
+        with open(secrets_file_path, 'r') as f:
+            secrets = json.load(f)
+            access_token = secrets['AIRTABLE_ACCESS_TOKEN']
+            app_id = secrets['AIRTABLE_APP_ID']
+
+        self.api = AirtableAPI(app_id, access_token)
+
+        self.features_scaled_json = self.api.get_table_data('features_scaled')
+        self.charts_json = self.api.get_table_data('charts')
+        self.lyric_sentiment_json = self.api.get_table_data('lyric_sentiment_scaled')
+        self.track_info_json = self.api.get_table_data('track_info')
+        self.binary_classification_json = self.api.get_table_data('binary_classifications')
 
     def all_plots(self):
         return [
@@ -21,8 +39,8 @@ class ETLPlots:
         ]
 
     def features_histogram(self):
-    
-        features_df = pd.read_csv(f'{self._datasets_path}/rank_1/features_scaled.csv')
+        
+        features_df = pd.DataFrame(self.features_scaled_json)
         
         float_cols = features_df.select_dtypes(include='float64').columns
         fig, ax = plt.subplots(figsize=(12, 6))
@@ -37,8 +55,8 @@ class ETLPlots:
     
     def features_changes_over_time(self):
     
-        features_df = pd.read_csv(f'{self._datasets_path}/rank_1/features_scaled.csv')
-        charts_df = pd.read_csv(f'{self._datasets_path}/rank_1/charts.csv')
+        features_df = pd.DataFrame(self.features_scaled_json)
+        charts_df = pd.DataFrame(self.charts_json)
     
         charts_df_first = charts_df.drop_duplicates(subset='Track ID', keep='first')
         merged_df = pd.merge(charts_df_first, features_df, left_on='Track ID', right_on='track_id')
@@ -78,8 +96,8 @@ class ETLPlots:
 
     def sentiment_distribution_per_track(self):
         
-        sentiment_df = pd.read_csv(f'{self._datasets_path}/rank_1/lyric_sentiment_scaled.csv')
-        info_df = pd.read_csv(f'{self._datasets_path}/rank_1/track_info.csv')
+        sentiment_df = pd.DataFrame(self.lyric_sentiment_json)
+        info_df = pd.DataFrame(self.track_info_json)
     
         song_names = info_df.set_index('track_id').loc[sentiment_df['track_id'], 'track_name'].tolist()
     
@@ -103,8 +121,8 @@ class ETLPlots:
 
     def sentiment_distribution_over_time(self):
         
-        sentiment_df = pd.read_csv(f'{self._datasets_path}/rank_1/lyric_sentiment_scaled.csv')
-        charts_df = pd.read_csv(f'{self._datasets_path}/rank_1/charts.csv')
+        sentiment_df = pd.DataFrame(self.lyric_sentiment_json)
+        charts_df = pd.DataFrame(self.charts_json)
         
         charts_df.rename(columns={'Track ID': 'track_id'}, inplace=True)
         merged_df = pd.merge(sentiment_df, charts_df, on='track_id')
@@ -137,7 +155,7 @@ class ETLPlots:
 
     def binary_classification(self):
         
-        plot_df = pd.read_csv(f'{self._datasets_path}/rank_1/binary_classifications.csv')
+        plot_df = pd.DataFrame(self.binary_classification_json)
 
         plot_df['Date'] = pd.to_datetime(plot_df['Date'])
         
@@ -167,7 +185,7 @@ class ETLPlots:
 
     def key_classification(self):
         
-        songs_data = pd.read_csv(f'{self._datasets_path}/rank_1/track_info.csv')
+        songs_data = pd.DataFrame(self.track_info_json)
 
         sns.set(style="whitegrid")
         
@@ -182,7 +200,7 @@ class ETLPlots:
         return fig
 
     def mode_classification(self):
-        songs_data = pd.read_csv(f'{self._datasets_path}/rank_1/track_info.csv')
+        songs_data = pd.DataFrame(self.track_info_json)
         songs_data['mode'] = songs_data['mode'].apply(lambda x: 0 if x == 'Minor' else 1)
         
         fig = plt.figure(figsize=(10, 6))

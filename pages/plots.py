@@ -9,7 +9,7 @@ st.set_page_config(layout="centered")
 
 st.title('Plots')
 
-plotter = ETLPlots('datasets')
+plotter = ETLPlots()
 plots = plotter.all_plots()
 
 for fig in plots:
